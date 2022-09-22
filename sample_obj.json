@@ -1,0 +1,66 @@
+{
+    "name": "Convalescent",
+    "experimentId": "18f88a02-98d6-12c3-74cb-0e10998306c6",
+    "uuid": "5223c1c5-bcb6-4ddd-9696-985fd49f3717",
+    "type": "10X Chromium",
+    "createdDate": "2022-09-21T09:53:25.716Z",
+    "lastModified": "2022-09-21T09:53:30.400Z",
+    "complete": false,
+    "error": false,
+    "fileNames": [
+        "matrix.mtx.gz",
+        "features.tsv.gz",
+        "barcodes.tsv.gz"
+    ],
+    "files": {
+        "matrix.mtx.gz": {
+            "upload": {
+                "status": "uploaded",
+                "progress": 100
+            },
+            "name": "matrix.mtx.gz",
+            "fileObject": {
+                "path": "Workshop/Convalescent/matrix.mtx.gz"
+            },
+            "size": 15137358,
+            "path": "Workshop/Convalescent/matrix.mtx.gz",
+            "valid": true,
+            "errors": "",
+            "compressed": true,
+            "lastModified": "2022-09-21T09:53:30.400Z"
+        },
+        "features.tsv.gz": {
+            "upload": {
+                "status": "uploaded",
+                "progress": 100
+            },
+            "name": "features.tsv.gz",
+            "fileObject": {
+                "path": "Workshop/Convalescent/features.tsv.gz"
+            },
+            "size": 255061,
+            "path": "Workshop/Convalescent/features.tsv.gz",
+            "valid": true,
+            "errors": "",
+            "compressed": true,
+            "lastModified": "2022-09-21T09:53:28.686Z"
+        },
+        "barcodes.tsv.gz": {
+            "upload": {
+                "status": "uploaded",
+                "progress": 100
+            },
+            "name": "barcodes.tsv.gz",
+            "fileObject": {
+                "path": "Workshop/Convalescent/barcodes.tsv.gz"
+            },
+            "size": 19953,
+            "path": "Workshop/Convalescent/barcodes.tsv.gz",
+            "valid": true,
+            "errors": "",
+            "compressed": true,
+            "lastModified": "2022-09-21T09:53:28.899Z"
+        }
+    },
+    "metadata": {}
+}
