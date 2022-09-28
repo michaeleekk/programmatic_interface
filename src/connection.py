@@ -8,8 +8,9 @@ import requests
 
 import datetime
 
-from file import File
+from sample_file import SampleFile
 from sample import Sample
+import re
 
 class Connection:
 
@@ -37,15 +38,19 @@ class Connection:
         except:
             raise Exception("Incorrect username or password")
 
-    def __fetch_api(self, url, json):
-        root_url = self.__default_config['url']
+    def __fetch_api(self, url, json, method='POST'):
+        methods = {
+            'POST': requests.post,
+            'PATCH': requests.patch
+        }
 
+        root_url = self.__default_config['url']
         headers = {
             'Authorization': 'Bearer ' + self.__jwt,
             'Content-Type': 'application/json'
         }
 
-        return requests.post(root_url + url, json=json, headers=headers)
+        return methods[method](root_url + url, json=json, headers=headers)
 
     def create_experiment(self):
         created_at = datetime.datetime.now().isoformat()
@@ -63,24 +68,33 @@ class Connection:
         print('Experiment {} created!'.format(experiment_id))
         return experiment_id
 
+    def __notify_upload(self, experiment_id, sample_id, sample_file_type):
+        url = "v2/experiments/{}/samples/{}/sampleFiles/{}".format(experiment_id, sample_id, sample_file_type)
+        json = {  
+            "uploadStatus": "uploaded"
+        }
+        response = self.__fetch_api(url, json, 'PATCH')
+
     def __create_sample_file(self, experiment_id, sample_uuid, sample_file):     
         url = 'v2/experiments/{}/samples/{}/sampleFiles/{}'.format(experiment_id, sample_uuid, sample_file.type())
         response = self.__fetch_api(url, sample_file.to_json())
         return response.content
 
-    def __create_sample(self, experiment_id, sample_obj):
-        sample = Sample(experiment_id, sample_obj)
-
+    def __create_and_upload_sample(self, experiment_id, sample):
         url = 'v2/experiments/{}/samples/{}'.format(experiment_id, sample.uuid())
         self.__fetch_api(url, sample.to_json())
-        print(sample.get_sample_files())
+
         for sample_file in sample.get_sample_files():
-            s3url = self.__create_sample_file(experiment_id, sample.uuid(), sample_file)
-            print(s3url)
+            s3url_raw = self.__create_sample_file(experiment_id, sample.uuid(), sample_file)
+            s3url = re.search(r"b\'\"(.*)\"\'", str(s3url_raw)).group(1)
+            
+            print('Uploading {}...'.format(sample_file.name()))
+            sample_file.upload_to_S3(s3url)
+            self.__notify_upload(experiment_id, sample.uuid(), sample_file.type())
+            print('Uploaded {}...'.format(sample_file.name()))
 
     def upload_samples(self, experiment_id, samples_path):
-        samples = File.get_files(samples_path)
-
-        for sample_obj in samples.values():
-            self.__create_sample(experiment_id, sample_obj)
+        samples = Sample.get_all_samples_from_path(samples_path)
+        for sample in samples:
+            self.__create_and_upload_sample(experiment_id, sample)
 
