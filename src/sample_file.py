@@ -20,6 +20,9 @@ class SampleFile:
     def name(self):
         return self.__path.split('/')[-1]
 
+    def uuid(self):
+        return self.__uuid
+
     def folder(self):
         return self.__path.split('/')[-2]
 
@@ -68,6 +71,10 @@ class SampleFile:
         if not self.__is_compressed():
             self.__compress()
 
-        files = { self.name() : (open(self.__path, 'rb')) }
+        # files = { self.name() : (open(self.__path, 'rb')) }
         headers = { 'Content-type': 'application/octet-stream' }
-        response = requests.put(signed_url, headers = headers, files = files)
+        # response = requests.put(signed_url, headers = headers, files = files)
+        with open(self.__path, 'rb') as file:
+            response = requests.put(signed_url, headers = headers, data = file.read())
+
+        print(response.content)

@@ -16,6 +16,9 @@ class Sample:
             'sampleTechnology': '10x'
         }
 
+    def name(self):
+        return self.__name
+
     def uuid(self):
         return self.__uuid
 
