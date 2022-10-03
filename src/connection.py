@@ -1,14 +1,10 @@
 from utils import load_json
 import boto3
 import requests
-
 import datetime
 import hashlib
 import requests
-
 import datetime
-
-from sample_file import SampleFile
 from sample import Sample
 import re
 
@@ -84,11 +80,13 @@ class Connection:
         url = 'v2/experiments/{}/samples/{}'.format(experiment_id, sample.uuid())
         self.__fetch_api(url, sample.to_json())
 
+        print('Created sample {} - {}'.format(sample.name(), sample.uuid()))
+
         for sample_file in sample.get_sample_files():
             s3url_raw = self.__create_sample_file(experiment_id, sample.uuid(), sample_file)
             s3url = re.search(r"b\'\"(.*)\"\'", str(s3url_raw)).group(1)
-            
-            print('Uploading {}...'.format(sample_file.name()))
+
+            print('Uploading {} - {}...'.format(sample_file.name(), sample_file.uuid()))
             sample_file.upload_to_S3(s3url)
             self.__notify_upload(experiment_id, sample.uuid(), sample_file.type())
             print('Uploaded {}...'.format(sample_file.name()))
