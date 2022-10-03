@@ -1,5 +1,4 @@
 from os.path import getsize
-
 import gzip
 import shutil
 import requests
@@ -70,11 +69,6 @@ class SampleFile:
     def upload_to_S3(self, signed_url):
         if not self.__is_compressed():
             self.__compress()
-
-        # files = { self.name() : (open(self.__path, 'rb')) }
         headers = { 'Content-type': 'application/octet-stream' }
-        # response = requests.put(signed_url, headers = headers, files = files)
         with open(self.__path, 'rb') as file:
             response = requests.put(signed_url, headers = headers, data = file.read())
-
-        print(response.content)
