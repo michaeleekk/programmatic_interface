@@ -48,7 +48,6 @@ class SampleFile:
             "metadata": {},
         }
 
-
     def __is_compressed(self):
         with gzip.open(self.__path, 'r') as fh:
             try:

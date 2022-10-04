@@ -1,1 +1,1 @@
-include config/*.json
+include cellenics_api/*.json
