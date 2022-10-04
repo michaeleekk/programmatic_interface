@@ -1,7 +1,7 @@
 import uuid
 from os import listdir
 from os.path import isfile, join
-from sample_file import SampleFile
+from cellenics_api.sample_file import SampleFile
 
 class Sample:
 

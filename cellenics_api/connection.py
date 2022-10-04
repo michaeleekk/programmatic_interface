@@ -1,15 +1,14 @@
-from utils import load_json
 import boto3
 import requests
 import datetime
 import hashlib
 import requests
 import datetime
-from sample import Sample
 import re
+from cellenics_api.sample import Sample
+from cellenics_api.utils import load_json
 
 class Connection:
-
     def __init__(self, username, password):
         self.__cognito_config = load_json('cognito.config.json')
         self.__default_config = load_json('default.config.json')
@@ -40,7 +39,7 @@ class Connection:
             'PATCH': requests.patch
         }
 
-        root_url = self.__default_config['url']
+        root_url = self.__default_config['api-url']
         headers = {
             'Authorization': 'Bearer ' + self.__jwt,
             'Content-Type': 'application/json'
@@ -86,13 +85,14 @@ class Connection:
             s3url_raw = self.__create_sample_file(experiment_id, sample.uuid(), sample_file)
             s3url = re.search(r"b\'\"(.*)\"\'", str(s3url_raw)).group(1)
 
-            print('Uploading {} - {}...'.format(sample_file.name(), sample_file.uuid()))
             sample_file.upload_to_S3(s3url)
             self.__notify_upload(experiment_id, sample.uuid(), sample_file.type())
-            print('Uploaded {}...'.format(sample_file.name()))
+            print('Uploaded {} - {}...'.format(sample_file.name(), sample_file.uuid()))
 
     def upload_samples(self, experiment_id, samples_path):
         samples = Sample.get_all_samples_from_path(samples_path)
         for sample in samples:
             self.__create_and_upload_sample(experiment_id, sample)
 
+        print('Project successfully created!')
+        print('Visit {} to process your project.'.format(self.__default_config['ui-url']))
