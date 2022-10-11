@@ -18,10 +18,9 @@ class Connection:
         client = boto3.client('cognito-idp')
 
         try:
-            resp = client.admin_initiate_auth(
-                UserPoolId=self.__cognito_config['UserPoolId'],
+            resp = client.initiate_auth(
                 ClientId=self.__cognito_config['ClientId'],
-                AuthFlow='ADMIN_NO_SRP_AUTH',
+                AuthFlow='USER_PASSWORD_AUTH',
                 AuthParameters = { 
                     "USERNAME": username,
                     "PASSWORD": password
@@ -84,7 +83,6 @@ class Connection:
         for sample_file in sample.get_sample_files():
             s3url_raw = self.__create_sample_file(experiment_id, sample.uuid(), sample_file)
             s3url = re.search(r"b\'\"(.*)\"\'", str(s3url_raw)).group(1)
-
             sample_file.upload_to_S3(s3url)
             self.__notify_upload(experiment_id, sample.uuid(), sample_file.type())
             print('Uploaded {} - {}...'.format(sample_file.name(), sample_file.uuid()))

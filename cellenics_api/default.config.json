@@ -1,4 +1,4 @@
 {
-    "api-url": "https://api.scp.biomage.net/",
-    "ui-url": "https://scp.biomage.net/"
+    "api-url": "https://api-default.scp-staging.biomage.net/",
+    "ui-url": "https://ui-default.scp-staging.biomage.net/"
 }
