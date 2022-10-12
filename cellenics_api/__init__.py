@@ -1,1 +1,0 @@
-from cellenics_api.connection import Connection

@@ -1,1 +1,2 @@
-cellenics-api==0.0.4
+biomage-programmatic-interface==0.0.1
+boto3==1.24.89
