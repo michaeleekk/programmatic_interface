@@ -32,3 +32,14 @@ Once the upload is complete you can navigate to [Cellenics](https://scp.biomage.
 2. Run step #3 again
 
 *This will be fixed when error handling is introduced*
+
+### How to build the pip package
+
+Update the version of the package and then build it:
+
+`python3 -m build`
+
+`twine upload dist/*`
+
+
+### How to build the docker images
