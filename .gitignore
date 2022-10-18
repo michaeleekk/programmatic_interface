@@ -4,3 +4,5 @@ credentials.json
 build/
 *.egg-info/
 dist/
+.nextflow.log*
+.nextflow

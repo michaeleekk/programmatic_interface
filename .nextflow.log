@@ -1,8 +1,0 @@
-Oct-12 12:45:35.751 [main] DEBUG nextflow.cli.Launcher - $> nextflow run main.nf --outdir results --email kristian@biomage.net --password Darkkris$10 --aligner kallisto --output_10x -profile test,docker -resume
-Oct-12 12:45:35.780 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 22.04.5
-Oct-12 12:45:35.793 [main] DEBUG nextflow.cli.Launcher - Operation aborted
-nextflow.exception.AbortOperationException: Cannot find script file: main.nf
-	at nextflow.cli.CmdRun.getScriptFile(CmdRun.groovy:419)
-	at nextflow.cli.CmdRun.run(CmdRun.groovy:287)
-	at nextflow.cli.Launcher.run(Launcher.groovy:480)
-	at nextflow.cli.Launcher.main(Launcher.groovy:639)

@@ -15,7 +15,7 @@ class Connection:
         self.__try_authenticate(username, password)
 
     def __try_authenticate(self, username, password):
-        client = boto3.client('cognito-idp')
+        client = boto3.client('cognito-idp', region='eu-west-1')
 
         try:
             resp = client.initiate_auth(
