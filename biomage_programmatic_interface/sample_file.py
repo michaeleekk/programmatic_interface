@@ -35,7 +35,7 @@ class SampleFile:
             'features': 'features10x',
             'genes': 'features10x',
         }
-
+        print(self.name())
         for file_type_key in file_types.keys():
             if file_type_key in self.name():
                 return file_types[file_type_key]

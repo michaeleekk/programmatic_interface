@@ -9,9 +9,8 @@ from biomage_programmatic_interface.sample import Sample
 from biomage_programmatic_interface.utils import load_json
 
 class Connection:
-    def __init__(self, username, password):
-        self.__cognito_config = load_json('cognito.config.json')
-        self.__default_config = load_json('default.config.json')
+    def __init__(self, username, password, instance='biomage'):
+        self.__config = load_json('config.json')[instance]
         self.__try_authenticate(username, password)
 
     def __try_authenticate(self, username, password):
@@ -19,7 +18,7 @@ class Connection:
 
         try:
             resp = client.initiate_auth(
-                ClientId=self.__cognito_config['ClientId'],
+                ClientId=self.__config['ClientId'],
                 AuthFlow='USER_PASSWORD_AUTH',
                 AuthParameters = { 
                     "USERNAME": username,
@@ -38,7 +37,7 @@ class Connection:
             'PATCH': requests.patch
         }
 
-        root_url = self.__default_config['api-url']
+        root_url = self.__config['URL']
         headers = {
             'Authorization': 'Bearer ' + self.__jwt,
             'Content-Type': 'application/json'
@@ -93,4 +92,3 @@ class Connection:
             self.__create_and_upload_sample(experiment_id, sample)
 
         print('Project successfully created!')
-        print('Visit {} to process your project.'.format(self.__default_config['ui-url']))

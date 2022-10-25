@@ -1,0 +1,11 @@
+{
+    "staging": {
+        "ClientId": "1g39sat7io12nhkuqnjuc1sq36",
+        "URL": "https://api-default.scp-staging.biomage.net"
+    },
+    
+    "biomage": {
+        "ClientId": "6os43ofjnfggg7tpp1h53p1vb2",
+        "URL": "https://api.scp.biomage.net/"
+    }
+}

@@ -2,6 +2,7 @@ import uuid
 from os import listdir
 from os.path import isfile, join
 from biomage_programmatic_interface.sample_file import SampleFile
+from biomage_programmatic_interface.utils import is_file_hidden
 
 class Sample:
 
@@ -37,6 +38,9 @@ class Sample:
         ret = {}
         for file_path in file_paths:
             full_path = join(path, file_path)
+
+            if is_file_hidden(full_path):
+                continue
 
             if isfile(full_path):
                 file = SampleFile(full_path)
