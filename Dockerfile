@@ -1,4 +1,4 @@
-FROM python:3.9.9-slim
+FROM amd64/python:3.9-slim
 
 # Install app dependencies
 COPY requirements.txt ./

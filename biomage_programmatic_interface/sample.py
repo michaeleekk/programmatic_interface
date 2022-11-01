@@ -14,7 +14,8 @@ class Sample:
     def to_json(self):
         return {
             'name': self.__name,
-            'sampleTechnology': '10x'
+            'sampleTechnology': '10x',
+            'options': {}
         }
 
     def name(self):
