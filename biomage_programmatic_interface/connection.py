@@ -6,19 +6,26 @@ import requests
 import datetime
 import re
 from biomage_programmatic_interface.sample import Sample
-from biomage_programmatic_interface.utils import load_json
 
 class Connection:
-    def __init__(self, username, password, instance='biomage'):
-        self.__config = load_json('config.json')[instance]
-        self.__try_authenticate(username, password)
+    def __init__(self, username, password, instance_url):
+        self.__api_url = self.__get_api_url(instance_url)
 
-    def __try_authenticate(self, username, password):
-        client = boto3.client('cognito-idp', region_name='eu-west-1')
+        cognito_params = self.__get_cognito_params().json()
+        clientId = cognito_params['clientId']
+        region = cognito_params['clientRegion']
+
+        self.__try_authenticate(username, password, clientId, region)
+
+    def __get_cognito_params(self):
+        return requests.get(self.__api_url + 'v2/programmaticInterfaceClient')
+
+    def __try_authenticate(self, username, password, clientId, region):
+        client = boto3.client('cognito-idp', region_name=region)
 
         try:
             resp = client.initiate_auth(
-                ClientId=self.__config['ClientId'],
+                ClientId=clientId,
                 AuthFlow='USER_PASSWORD_AUTH',
                 AuthParameters = { 
                     "USERNAME": username,
@@ -37,13 +44,17 @@ class Connection:
             'PATCH': requests.patch
         }
 
-        root_url = self.__config['URL']
         headers = {
             'Authorization': 'Bearer ' + self.__jwt,
             'Content-Type': 'application/json'
         }
 
-        return methods[method](root_url + url, json=json, headers=headers)
+        return methods[method](self.__api_url + url, json=json, headers=headers)
+
+    def __get_api_url(self, instance_url):
+        if instance_url == 'local':
+            return 'http://localhost:3000/'
+        return f'https://api.{instance_url}/'
 
     def create_experiment(self):
         created_at = datetime.datetime.now().isoformat()
