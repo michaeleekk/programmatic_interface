@@ -23,20 +23,18 @@ class Connection:
     def __try_authenticate(self, username, password, clientId, region):
         client = boto3.client('cognito-idp', region_name=region)
 
-        try:
-            resp = client.initiate_auth(
-                ClientId=clientId,
-                AuthFlow='USER_PASSWORD_AUTH',
-                AuthParameters = { 
-                    "USERNAME": username,
-                    "PASSWORD": password
-                }
-            )
+        resp = client.initiate_auth(
+            ClientId=clientId,
+            AuthFlow='USER_PASSWORD_AUTH',
+            AuthParameters = { 
+                "USERNAME": username,
+                "PASSWORD": password
+            }
+        )
 
-            print('Authorization succesfull')
-            self.__jwt = resp['AuthenticationResult']['IdToken']
-        except:
-            raise Exception("Incorrect username or password")
+        print('Authorization succesfull')
+        self.__jwt = resp['AuthenticationResult']['IdToken']
+
 
     def __fetch_api(self, url, json, method='POST'):
         methods = {
@@ -54,6 +52,8 @@ class Connection:
     def __get_api_url(self, instance_url):
         if instance_url == 'local':
             return 'http://localhost:3000/'
+        if instance_url.startswith('https://'):
+            return instance_url
         return f'https://api.{instance_url}/'
 
     def create_experiment(self):
