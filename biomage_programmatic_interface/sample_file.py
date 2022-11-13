@@ -45,7 +45,6 @@ class SampleFile:
         return {
             'sampleFileId': self.__uuid,
             'size': self.size(),
-            "metadata": {},
         }
 
     def __is_compressed(self):

@@ -6,33 +6,41 @@ import requests
 import datetime
 import re
 from biomage_programmatic_interface.sample import Sample
+import biomage_programmatic_interface.exceptions as exceptions
 
 class Connection:
-    def __init__(self, username, password, instance_url):
+    def __init__(self, username, password, instance_url, verbose=True):
+        self.verbose = verbose
         self.__api_url = self.__get_api_url(instance_url)
-
         cognito_params = self.__get_cognito_params().json()
         clientId = cognito_params['clientId']
         region = cognito_params['clientRegion']
+        self.__authenticate(username, password, clientId, region)
 
-        self.__try_authenticate(username, password, clientId, region)
-
+    
     def __get_cognito_params(self):
-        return requests.get(self.__api_url + 'v2/programmaticInterfaceClient')
+        try:
+            return requests.get(self.__api_url + 'v2/programmaticInterfaceClient')
+        except Exception as e:
+            raise exceptions.InstanceNotFound() from None
 
-    def __try_authenticate(self, username, password, clientId, region):
+    def __authenticate(self, username, password, clientId, region):
         client = boto3.client('cognito-idp', region_name=region)
 
-        resp = client.initiate_auth(
-            ClientId=clientId,
-            AuthFlow='USER_PASSWORD_AUTH',
-            AuthParameters = { 
-                "USERNAME": username,
-                "PASSWORD": password
-            }
-        )
+        try:
+            resp = client.initiate_auth(
+                ClientId=clientId,
+                AuthFlow='USER_PASSWORD_AUTH',
+                AuthParameters = { 
+                    "USERNAME": username,
+                    "PASSWORD": password
+                }
+            )
+        except Exception as e:
+            raise exceptions.IncorrectCredentials() from None
 
-        print('Authorization succesfull')
+        print('Authorization succesfull') if self.verbose else ""
+
         self.__jwt = resp['AuthenticationResult']['IdToken']
 
 
@@ -69,7 +77,7 @@ class Connection:
 
         response = self.__fetch_api('v2/experiments/' + experiment_id, json=experiment_data)
 
-        print('Experiment {} created!'.format(experiment_id))
+        print('Experiment {} created!'.format(experiment_id)) if self.verbose else ""
         return experiment_id
 
     def __notify_upload(self, experiment_id, sample_id, sample_file_type):
@@ -88,18 +96,20 @@ class Connection:
         url = 'v2/experiments/{}/samples/{}'.format(experiment_id, sample.uuid())
         self.__fetch_api(url, sample.to_json())
 
-        print('Created sample {} - {}'.format(sample.name(), sample.uuid()))
+        print('Created sample {} - {}'.format(sample.name(), sample.uuid())) if self.verbose else ""
 
         for sample_file in sample.get_sample_files():
             s3url_raw = self.__create_sample_file(experiment_id, sample.uuid(), sample_file)
             s3url = re.search(r"b\'\"(.*)\"\'", str(s3url_raw)).group(1)
             sample_file.upload_to_S3(s3url)
             self.__notify_upload(experiment_id, sample.uuid(), sample_file.type())
-            print('Uploaded {} - {}...'.format(sample_file.name(), sample_file.uuid()))
+            print('Uploaded {} - {}...'.format(sample_file.name(), sample_file.uuid())) if self.verbose else ""
 
     def upload_samples(self, experiment_id, samples_path):
         samples = Sample.get_all_samples_from_path(samples_path)
         for sample in samples:
-            self.__create_and_upload_sample(experiment_id, sample)
-
-        print('Project successfully created!')
+            try:
+                self.__create_and_upload_sample(experiment_id, sample)
+            except Exception:
+                print('Upload failed. This is likely an error within the python package for uploading.\n\
+Please send an email to hello@biomage.net and we will try to resolve this problem as soon as possible')
