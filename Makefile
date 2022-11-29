@@ -39,7 +39,7 @@ fmt: develop ## Formats python files
 
 check: develop ## Checks code for linting/construct errors
 	@echo "==> Checking if files are well formatted..."
-	@venv/bin/flake8 --per-file-ignores="__init__.py:F401" $(PACKAGE)
+	@venv/bin/flake8 $(PACKAGE)
 	@echo "    [✓]"
 	@echo
 
