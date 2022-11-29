@@ -9,7 +9,7 @@ with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
 
 setup(
     name="biomage_programmatic_interface",
-    version='{{VERSION_PLACEHOLDER}}',
+    version='0.0.0',
     author="Biomage Ltd",
     author_email="engineering@biomage.net",
     description="For programmatic upload of files to Cellencis",
