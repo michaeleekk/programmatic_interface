@@ -8,7 +8,7 @@ class Sample:
 
     def __init__(self, name):
         self.__name = name
-        self.__uuid = str(uuid.uuid4())
+        self.__uuid = None
         self.__sample_files = []
     
     def to_json(self):
@@ -29,6 +29,12 @@ class Sample:
 
     def get_sample_files(self):
         return self.__sample_files
+
+    def set_uuid(self, uuid):
+        if (self.__uuid == None):
+            self.__uuid = uuid
+        else:
+            raise Exception(f"uuid already set for sample {self.__name}")
 
     def add_sample_file(self, sample_file):
         self.__sample_files.append(sample_file)

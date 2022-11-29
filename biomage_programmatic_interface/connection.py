@@ -5,6 +5,7 @@ import hashlib
 import requests
 import datetime
 import re
+import json
 from biomage_programmatic_interface.sample import Sample
 import biomage_programmatic_interface.exceptions as exceptions
 
@@ -39,12 +40,12 @@ class Connection:
         except Exception as e:
             raise exceptions.IncorrectCredentials() from None
 
-        print('Authorization succesfull') if self.verbose else ""
+        print('Authorization successful') if self.verbose else ""
 
         self.__jwt = resp['AuthenticationResult']['IdToken']
 
 
-    def __fetch_api(self, url, json, method='POST'):
+    def __fetch_api(self, url, body, method='POST'):
         methods = {
             'POST': requests.post,
             'PATCH': requests.patch
@@ -55,7 +56,7 @@ class Connection:
             'Content-Type': 'application/json'
         }
 
-        return methods[method](self.__api_url + url, json=json, headers=headers)
+        return methods[method](self.__api_url + url, json=body, headers=headers)
 
     def __get_api_url(self, instance_url):
         if instance_url == 'local':
@@ -75,28 +76,39 @@ class Connection:
             'description': ''
         }
 
-        response = self.__fetch_api('v2/experiments/' + experiment_id, json=experiment_data)
+        response = self.__fetch_api('v2/experiments/' + experiment_id, body=experiment_data)
 
         print('Experiment {} created!'.format(experiment_id)) if self.verbose else ""
         return experiment_id
 
     def __notify_upload(self, experiment_id, sample_id, sample_file_type):
         url = "v2/experiments/{}/samples/{}/sampleFiles/{}".format(experiment_id, sample_id, sample_file_type)
-        json = {  
+        body = {  
             "uploadStatus": "uploaded"
         }
-        response = self.__fetch_api(url, json, 'PATCH')
+        response = self.__fetch_api(url, body, 'PATCH')
 
     def __create_sample_file(self, experiment_id, sample_uuid, sample_file):     
         url = 'v2/experiments/{}/samples/{}/sampleFiles/{}'.format(experiment_id, sample_uuid, sample_file.type())
         response = self.__fetch_api(url, sample_file.to_json())
         return response.content
 
-    def __create_and_upload_sample(self, experiment_id, sample):
+    def __create_samples(self, experiment_id, samples):
+        url = f"v2/experiments/{experiment_id}/samples"
+        body = [sample.to_json() for sample in samples]
+        
+        sample_ids_by_name = self.__fetch_api(url, body).json()
+
+        for sample in samples:
+
+            uuid = sample_ids_by_name[sample.name()]
+            sample.set_uuid(uuid)
+
+    def __upload_sample(self, experiment_id, sample):
         url = 'v2/experiments/{}/samples/{}'.format(experiment_id, sample.uuid())
         self.__fetch_api(url, sample.to_json())
 
-        print('Created sample {} - {}'.format(sample.name(), sample.uuid())) if self.verbose else ""
+        print('Uploading sample {} - {}'.format(sample.name(), sample.uuid())) if self.verbose else ""
 
         for sample_file in sample.get_sample_files():
             s3url_raw = self.__create_sample_file(experiment_id, sample.uuid(), sample_file)
@@ -107,9 +119,14 @@ class Connection:
 
     def upload_samples(self, experiment_id, samples_path):
         samples = Sample.get_all_samples_from_path(samples_path)
+
+        self.__create_samples(experiment_id, samples)
+
         for sample in samples:
             try:
-                self.__create_and_upload_sample(experiment_id, sample)
-            except Exception:
+                self.__upload_sample(experiment_id, sample)
+            except Exception as e:
+                print("eDebug")
+                print(e)
                 print('Upload failed. This is likely an error within the python package for uploading.\n\
 Please send an email to hello@biomage.net and we will try to resolve this problem as soon as possible')
