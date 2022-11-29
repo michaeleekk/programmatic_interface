@@ -33,9 +33,9 @@ Once the upload is complete you can navigate to [Biomage](https://scp.biomage.ne
 ### `Connection` class
 
 The object accepts 3 parameters:
-    1. `email` - Biomage email
-    2. `password` - Biomage password
-    3. `instance_url` - Biomage instance url
+1. `email` - Biomage email
+2. `password` - Biomage password
+3. `instance_url` - Biomage instance url
 
 - Copy the url of the Biomage instance *excluding* `https://`
 - If the url is https://scp.biomage.net/ enter just the domain name: `scp.biomage.net`
