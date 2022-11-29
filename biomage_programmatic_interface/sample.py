@@ -28,7 +28,7 @@ class Sample:
         return self.__sample_files
 
     def set_uuid(self, uuid):
-        if (self.__uuid == None):
+        if self.__uuid == None:
             self.__uuid = uuid
         else:
             raise Exception(f"uuid already set for sample {self.__name}")
