@@ -36,15 +36,12 @@ class Connection:
         except Exception:
             raise exceptions.IncorrectCredentials() from None
 
-        print('Authorization successful') if self.verbose else ""
+        print("Authorization successful") if self.verbose else ""
 
         self.__jwt = resp["AuthenticationResult"]["IdToken"]
 
-    def __fetch_api(self, url, body, method='POST'):
-        methods = {
-            'POST': requests.post,
-            'PATCH': requests.patch
-        }
+    def __fetch_api(self, url, body, method="POST"):
+        methods = {"POST": requests.post, "PATCH": requests.patch}
 
         headers = {
             "Authorization": "Bearer " + self.__jwt,
@@ -93,7 +90,7 @@ class Connection:
     def __create_samples(self, experiment_id, samples):
         url = f"v2/experiments/{experiment_id}/samples"
         body = [sample.to_json() for sample in samples]
-        
+
         sample_ids_by_name = self.__fetch_api(url, body).json()
 
         for sample in samples:
@@ -102,10 +99,12 @@ class Connection:
             sample.set_uuid(uuid)
 
     def __upload_sample(self, experiment_id, sample):
-        url = 'v2/experiments/{}/samples/{}'.format(experiment_id, sample.uuid())
+        url = "v2/experiments/{}/samples/{}".format(experiment_id, sample.uuid())
         self.__fetch_api(url, sample.to_json())
 
-        print('Uploading sample {} - {}'.format(sample.name(), sample.uuid())) if self.verbose else ""
+        print(
+            "Uploading sample {} - {}".format(sample.name(), sample.uuid())
+        ) if self.verbose else ""
 
         for sample_file in sample.get_sample_files():
             s3url_raw = self.__create_sample_file(
