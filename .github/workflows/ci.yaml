@@ -71,7 +71,7 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64
-          tags: ${{ format('{0}/{1}:{2}', secrets.DOCKER_USERNAME, steps.ref.outputs.repo-name, github.event.release.tag_name) }}
+          tags: ${{ format('{0}/programmatic-interface:{1}', secrets.DOCKER_USERNAME, github.event.release.tag_name) }}
           push: true
 
   report-if-failed:
