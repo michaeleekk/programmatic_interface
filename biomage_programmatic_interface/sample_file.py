@@ -55,7 +55,7 @@ class SampleFile:
                 # Try to read 1 byte of the file (Fails if not zipped)
                 fh.read1()
                 return True
-            except:
+            except Exception:
                 return False
 
     def __compress(self):

@@ -68,11 +68,9 @@ class Connection:
             "description": "",
         }
 
-        self.__fetch_api(
-            "v2/experiments/" + experiment_id, json=experiment_data
-        )
+        self.__fetch_api("v2/experiments/" + experiment_id, json=experiment_data)
 
-        print("Experiment {} created!".format(experiment_id)) if self.verbose else ""
+        print(f"Experiment {experiment_id} created!") if self.verbose else ""
         return experiment_id
 
     def __notify_upload(self, experiment_id, sample_id, sample_file_type):
@@ -90,7 +88,7 @@ class Connection:
         return response.content
 
     def __create_and_upload_sample(self, experiment_id, sample):
-        url = "v2/experiments/{}/samples/{}".format(experiment_id, sample.uuid())
+        url = f"v2/experiments/{experiment_id}/samples/{sample.uuid()}"
         self.__fetch_api(url, sample.to_json())
 
         print(
@@ -103,9 +101,11 @@ class Connection:
             )
             s3url = re.search(r"b\'\"(.*)\"\'", str(s3url_raw)).group(1)
             sample_file.upload_to_S3(s3url)
+
             self.__notify_upload(experiment_id, sample.uuid(), sample_file.type())
+
             print(
-                "Uploaded {} - {}...".format(sample_file.name(), sample_file.uuid())
+                f"Uploaded {sample_file.name()} - {sample_file.uuid()}..."
             ) if self.verbose else ""
 
     def upload_samples(self, experiment_id, samples_path):
@@ -115,6 +115,10 @@ class Connection:
                 self.__create_and_upload_sample(experiment_id, sample)
             except Exception as e:
                 print(
-                    f"Upload failed: {e}. This is likely an error within the python package for uploading.\n\
-Please send an email to hello@biomage.net and we will try to resolve this problem as soon as possible"
+                    f"Upload failed: {e}. This is likely an error within \
+                     the python package for uploading."
+                )
+                print(
+                    "Please send an email to hello@biomage.net and we \
+                     will try to resolve this problem as soon as possible"
                 )
