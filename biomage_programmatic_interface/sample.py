@@ -1,22 +1,19 @@
 import uuid
 from os import listdir
 from os.path import isfile, join
+
 from biomage_programmatic_interface.sample_file import SampleFile
 from biomage_programmatic_interface.utils import is_file_hidden
 
-class Sample:
 
+class Sample:
     def __init__(self, name):
         self.__name = name
         self.__uuid = None
         self.__sample_files = []
-    
+
     def to_json(self):
-        return {
-            'name': self.__name,
-            'sampleTechnology': '10x',
-            'options': {}
-        }
+        return {"name": self.__name, "sampleTechnology": "10x", "options": {}}
 
     def name(self):
         return self.__name
@@ -52,8 +49,8 @@ class Sample:
             if isfile(full_path):
                 file = SampleFile(full_path)
                 folder_name = file.folder()
-    
-                if ret.get(folder_name) == None:
+
+                if ret.get(folder_name) is None:
                     ret[folder_name] = Sample(folder_name)
                 ret[folder_name].add_sample_file(file)
                 continue
@@ -62,5 +59,5 @@ class Sample:
         return ret
 
     @staticmethod
-    def get_all_samples_from_path(path): 
+    def get_all_samples_from_path(path):
         return Sample.__find_all_files_recursively(path).values()
