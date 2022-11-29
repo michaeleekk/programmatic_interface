@@ -58,3 +58,21 @@ After `requirements.txt` has been updated with the correct package version run:
 ./docker-build-upload.sh {version}
 ```
 where `version` is the version of the docker image, e.g. 0.0.3 
+
+### Development
+
+If you cloned the repository and want to try using your local version, do the following:
+
+- Go to `setup.py` and replace `version='{{VERSION_PLACEHOLDER}}',` with `version='0.0.0',`. 
+Make sure not to commit this change.
+
+- Once that is done:
+```bash
+cd programmatic_interface
+pip install .
+```
+
+- Now you can import the package and use your local version
+```python
+import biomage_programmatic_interface as bpi
+```
