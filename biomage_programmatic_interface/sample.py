@@ -1,4 +1,3 @@
-import uuid
 from os import listdir
 from os.path import isfile, join
 
@@ -12,26 +11,25 @@ class Sample:
         self.__uuid = None
         self.__sample_files = []
 
-    def to_json(self):
-        return {"name": self.__name, "sampleTechnology": "10x", "options": {}}
-
+    @property
     def name(self):
         return self.__name
 
+    @property
     def uuid(self):
         return self.__uuid
 
-    def experiment_id(self):
-        return self.__experiment_id
+    @uuid.setter
+    def uuid(self, uuid):
+        if self.__uuid is not None:
+            raise Exception(f"uuid already set for sample {self.__name}")
+        self.__uuid = uuid
+
+    def to_json(self):
+        return {"name": self.__name, "sampleTechnology": "10x", "options": {}}
 
     def get_sample_files(self):
         return self.__sample_files
-
-    def set_uuid(self, uuid):
-        if self.__uuid == None:
-            self.__uuid = uuid
-        else:
-            raise Exception(f"uuid already set for sample {self.__name}")
 
     def add_sample_file(self, sample_file):
         self.__sample_files.append(sample_file)
@@ -48,7 +46,7 @@ class Sample:
 
             if isfile(full_path):
                 file = SampleFile(full_path)
-                folder_name = file.folder()
+                folder_name = file.folder
 
                 if ret.get(folder_name) is None:
                     ret[folder_name] = Sample(folder_name)
