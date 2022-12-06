@@ -43,7 +43,7 @@ class Connection:
             return instance_url
         return f"https://api.{instance_url}/"
 
-    def fetch_api(self, url, json, method="POST"):
+    def fetch_api(self, url, body, method="POST"):
         methods = {"POST": requests.post, "PATCH": requests.patch}
 
         headers = {
@@ -51,7 +51,7 @@ class Connection:
             "Content-Type": "application/json",
         }
 
-        return methods[method](self.__api_url + url, json=json, headers=headers)
+        return methods[method](self.__api_url + url, json=body, headers=headers)
 
     def uploadS3(self, objectS3, signed_url, compress=True):
         if compress and not objectS3.is_compressed():

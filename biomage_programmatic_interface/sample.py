@@ -1,4 +1,3 @@
-import uuid
 from os import listdir
 from os.path import isfile, join
 
@@ -9,7 +8,7 @@ from biomage_programmatic_interface.utils import is_file_hidden
 class Sample:
     def __init__(self, name):
         self.__name = name
-        self.__uuid = str(uuid.uuid4())
+        self.__uuid = None
         self.__sample_files = []
 
     @property
@@ -19,6 +18,12 @@ class Sample:
     @property
     def uuid(self):
         return self.__uuid
+
+    @uuid.setter
+    def uuid(self, uuid):
+        if self.__uuid is not None:
+            raise Exception(f"uuid already set for sample {self.__name}")
+        self.__uuid = uuid
 
     def to_json(self):
         return {"name": self.__name, "sampleTechnology": "10x", "options": {}}
