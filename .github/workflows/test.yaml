@@ -1,5 +1,9 @@
 name: Build and Upload the pip package and Deploy the docker image
 on:
+  push:
+    branches:
+      - "docker-image-from-source"
+
   pull_request:
     branches:
       - "docker-image-from-source"
