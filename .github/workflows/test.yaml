@@ -1,49 +1,10 @@
 name: Build and Upload the pip package and Deploy the docker image
 on:
-  release:
-    types:
-      - released
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  pull_request:
+    branches:
+      - "docker-image-from-source"
 
 jobs:
-  build:
-    name: Build pip package
-    runs-on: ubuntu-latest
-    steps:
-      - id: checkout
-        name: Check out source code
-        uses: actions/checkout@v3
-
-      - name: Set up Python environment
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.x"
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install setuptools wheel twine
-      
-      - name: Extract tag name
-        id: tag
-        run: echo "TAG_NAME=$(echo $GITHUB_REF | cut -d / -f 3)" >> $GITHUB_OUTPUT
-
-      - name: Update version in setup.py
-        run: >-
-          sed -i "s/0.0.0/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
-      
-      - name: Build and publish
-        env:
-          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
-        run: |
-          python setup.py sdist bdist_wheel 
-          twine upload dist/*
-
   build-docker:
     name: Build Docker container
     runs-on: ubuntu-latest
@@ -70,7 +31,7 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64
-          tags: ${{ format('{0}/programmatic-interface:{1}', secrets.DOCKER_USERNAME, github.event.release.tag_name) }}
+          tags: ${{ format('{0}/programmatic-interface:{1}', secrets.DOCKER_USERNAME, '0.0.26') }}
           push: true
 
   report-if-failed:
