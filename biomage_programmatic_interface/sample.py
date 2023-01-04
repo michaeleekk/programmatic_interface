@@ -46,6 +46,10 @@ class Sample:
 
             if isfile(full_path):
                 file = SampleFile(full_path)
+
+                if not file.is_valid_type():
+                    continue
+
                 folder_name = file.folder
 
                 if ret.get(folder_name) is None:
