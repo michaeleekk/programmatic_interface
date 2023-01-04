@@ -28,12 +28,15 @@ class SampleFile(ObjectS3):
     def get_size(self):
         return getsize(self.path)
 
+    def is_valid_type(self):
+        return self.get_type() is not None
+
     def get_type(self):
         file_types = {
-            "matrix": "matrix10x",
-            "barcodes": "barcodes10x",
-            "features": "features10x",
-            "genes": "features10x",
+            "matrix.mtx": "matrix10x",
+            "barcodes.tsv": "barcodes10x",
+            "features.tsv": "features10x",
+            "genes.tsv": "features10x",
         }
 
         for file_type_key in file_types.keys():
