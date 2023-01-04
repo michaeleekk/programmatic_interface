@@ -1,5 +1,9 @@
 FROM amd64/python:3.9-slim
 
+# Install git
+RUN apt-get -y update
+RUN apt-get -y install git
+
 # Install app dependencies
 COPY requirements.txt ./
 RUN python -m pip install --upgrade pip
