@@ -53,9 +53,6 @@ class Experiment:
             sample.uuid = sample_ids_by_name[sample.name]
 
     def __upload_sample(self, sample):
-        url = f"v2/experiments/{self.id}/samples/{sample.uuid}"
-        self.__connection.fetch_api(url, sample.to_json())
-
         for sample_file in sample.get_sample_files():
             s3url_raw = self.__create_sample_file(
                 sample.uuid,
@@ -76,10 +73,8 @@ class Experiment:
                 self.__upload_sample(sample)
             except Exception as e:
                 print(
-                    f"Upload failed: {e}. This is likely an error within \
-                     the python package for uploading."
-                )
-                print(
-                    "Please send an email to hello@biomage.net and we \
-                     will try to resolve this problem as soon as possible"
+                    f"Upload failed: {e}. This is likely an error within ",
+                    "the python package for uploading.",
+                    "Please send an email to hello@biomage.net and we ",
+                    "will try to resolve this problem as soon as possible"
                 )
