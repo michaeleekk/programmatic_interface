@@ -80,7 +80,12 @@ class Connection:
             objectS3.compress()
         headers = {"Content-type": "application/octet-stream"}
         with open(objectS3.path, "rb") as file:
-            requests.put(signed_url, headers=headers, data=file.read())
+            try:
+                response = requests.put(signed_url, headers=headers, data=file.read())
+                response.raise_for_status()
+            except Exception as e:
+                print(f"exception: uploadS3: {objectS3}: {signed_url}")
+                raise e
 
         print(f"Uploaded {objectS3.path} to S3") if self.verbose else ""
 
