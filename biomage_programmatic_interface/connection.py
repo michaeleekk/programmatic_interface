@@ -18,7 +18,7 @@ class Connection:
         cognito_params = self.__get_cognito_params().json()
         self.clientId = cognito_params["clientId"]
         self.region = cognito_params["clientRegion"]
-        self.__authenticate()
+        self.authenticate()
 
     def __get_cognito_params(self):
         try:
@@ -26,7 +26,7 @@ class Connection:
         except Exception:
             raise exceptions.InstanceNotFound() from None
 
-    def __authenticate(self):
+    def authenticate(self):
         client = boto3.client("cognito-idp", region_name=self.region)
 
         try:
@@ -70,7 +70,7 @@ class Connection:
         except requests.exceptions.HTTPError as e:
             if response.status_code == 401:
                 print("fetch_api: refresh expired token")
-                self.__authenticate()
+                self.authenticate()
             raise e
 
         return response
