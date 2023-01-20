@@ -54,6 +54,9 @@ class Experiment:
 
     def __upload_sample(self, sample):
         for sample_file in sample.get_sample_files():
+            # refresh authentication here because otherwise it might fail during
+            # the S3 upload and we can't refresh it there because it's a signed URL
+            self.__connection.authenticate()
             s3url_raw = self.__create_sample_file(
                 sample.uuid,
                 sample_file,
