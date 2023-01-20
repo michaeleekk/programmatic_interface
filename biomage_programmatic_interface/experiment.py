@@ -75,7 +75,7 @@ class Experiment:
             try:
                 self.__upload_sample(sample)
             except Exception as e:
-                print(
+                raise Exception(
                     f"Upload failed: {e}. This is likely an error within ",
                     "the python package for uploading.",
                     "Please send an email to hello@biomage.net and we ",
