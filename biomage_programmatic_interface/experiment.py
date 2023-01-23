@@ -70,7 +70,7 @@ class Experiment:
                 sample_file,
             )
             s3url = s3url_raw.decode("utf-8").replace('"', "")
-            print(f"token: {self.__conection._Connection_jwt}")
+            print(f"token: {self.__connection._Connection_jwt}")
             print(f"{sample} {s3url}[{s3url_raw}], {sample.uuid}, {sample_file}")
             self.__connection.uploadS3(sample_file, s3url)
 
