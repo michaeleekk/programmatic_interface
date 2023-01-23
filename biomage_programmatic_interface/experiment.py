@@ -1,6 +1,8 @@
 import datetime
 import hashlib
 import backoff
+import requests
+
 from biomage_programmatic_interface.sample import Sample
 
 
