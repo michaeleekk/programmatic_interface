@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import hashlib
 import backoff
 import requests
@@ -9,7 +9,7 @@ from biomage_programmatic_interface.sample import Sample
 class Experiment:
     @staticmethod
     def create_experiment(connection, name=None):
-        created_at = datetime.datetime.now().isoformat()
+        created_at = datetime.now().isoformat()
         hashed_string = hashlib.md5(created_at.encode())
         id = hashed_string.hexdigest()
         name = name if name else id
@@ -84,6 +84,7 @@ class Experiment:
 
         exc = None
         for sample in samples:
+            print(f"1: {datetime.now()}")
             try:
                 self.__upload_sample(sample)
             except Exception as e:

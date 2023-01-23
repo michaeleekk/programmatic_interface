@@ -86,6 +86,7 @@ class Connection:
                 response = requests.put(signed_url, headers=headers, data=file.read())
                 response.raise_for_status()
             except Exception as e:
+                print("jwt: ", self.__jwt)
                 print(f"exception: uploadS3:\n {objectS3}:\n {signed_url}")
                 raise e
 
