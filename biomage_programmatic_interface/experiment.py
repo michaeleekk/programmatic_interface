@@ -19,11 +19,6 @@ class Experiment:
 
         connection.fetch_api("v2/experiments/" + id, body=experiment_data)
         return Experiment(connection, id, name)
-
-    def clone(self, to_user_id):
-        url = f"v2/experiments/{self.id}/clone"
-        response = self.__connection.fetch_api(url, body={"name": self.name, "toUserId": to_user_id})
-        return Experiment(self.__connection, response, self.name)
         
     def __init__(self, connection, id, name):
         self.__connection = connection
@@ -61,7 +56,6 @@ class Experiment:
         for sample_file in sample.get_sample_files():
             # refresh authentication here because otherwise it might fail during
             # the S3 upload and we can't refresh it there because it's a signed URL
-            self.__connection.authenticate()
             s3url_raw = self.__create_sample_file(
                 sample.uuid,
                 sample_file,
@@ -87,4 +81,14 @@ class Experiment:
                     "will try to resolve this problem as soon as possible"
                 )
 
+    def clone(self, to_user_id):
+        url = f"v2/experiments/{self.id}/clone"
+        response = self.__connection.fetch_api(url, body={"name": self.name, "toUserId": to_user_id})
+        print(response.content)
+        # return Experiment(self.__connection, response.content, self.name)
 
+    def run(self):
+        url = f'v2/experiments/{self.id}/gem2s'
+        print('Starting processing pipeline')
+        response = self.__connection.fetch_api(url)
+        print(response)

@@ -23,6 +23,7 @@ install: clean ## Creates venv and installs the package
 	@echo "==> Installing utility and dependencies..."
 	@venv/bin/pip install --upgrade pip
 	@venv/bin/pip install -e .
+	@venv/bin/pip install -r requirements.txt
 	@echo "    [✓]"
 	@echo
 

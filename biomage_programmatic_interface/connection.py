@@ -55,7 +55,7 @@ class Connection:
         max_tries=3,
         jitter=backoff.full_jitter,
     )
-    def fetch_api(self, url, body, method="POST"):
+    def fetch_api(self, url, body={}, method="POST"):
         headers = {
             "Authorization": "Bearer " + self.__jwt,
             "Content-Type": "application/json",
