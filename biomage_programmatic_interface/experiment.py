@@ -20,6 +20,11 @@ class Experiment:
         connection.fetch_api("v2/experiments/" + id, body=experiment_data)
         return Experiment(connection, id, name)
 
+    def clone(self, to_user_id):
+        url = f"v2/experiments/{self.id}/clone"
+        response = self.__connection.fetch_api(url, body={"name": self.name, "toUserId": to_user_id})
+        return Experiment(self.__connection, response, self.name)
+        
     def __init__(self, connection, id, name):
         self.__connection = connection
         self.__id = id
@@ -81,3 +86,5 @@ class Experiment:
                     "Please send an email to hello@biomage.net and we ",
                     "will try to resolve this problem as soon as possible"
                 )
+
+
