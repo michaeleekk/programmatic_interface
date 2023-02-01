@@ -11,7 +11,7 @@ HTTP_METHODS = {"POST": requests.post, "PATCH": requests.patch, "GET": requests.
 class Connection:
     def __init__(self, username, password, instance_url, verbose=True):
         self.verbose = verbose
-        self.__api_url = self.__get_api_url(instance_url)
+        self.__api_url, self.__ui_url = self.__get_endpoints(instance_url)
         self.username = username
         self.password = password
         self.instance_url = instance_url
@@ -42,14 +42,14 @@ class Connection:
 
         self.__jwt = resp["AuthenticationResult"]["IdToken"]
 
-    def __get_api_url(self, instance_url):
-        if instance_url == "local":
-            return "http://localhost:3000/"
-        if instance_url == 'production':
-            return "https://api.scp.biomage.net/"
-        if instance_url.startswith("https://"):
-            return instance_url
-        return f"https://api.{instance_url}/"
+    def __get_endpoints(self, instance_url):
+        if instance_url == "local" or "localhost" in instance_url:
+            return "http://localhost:3000/", "http://localhost:5000/"
+        if instance_url == "production" or "scp.biomage.net" in instance_url:
+            return "https://api.scp.biomage.net/", "https://scp.biomage.net/"
+
+        # paste full link for staged enviromnets
+        return instance_url, instance_url.replace("api", "ui", 1)
 
     @backoff.on_exception(
         backoff.constant,
@@ -95,3 +95,6 @@ class Connection:
         experiment = Experiment.create_experiment(self, experiment_name)
         print(f"Experiment {experiment.name} created!") if self.verbose else ""
         return experiment
+
+    def get_experiment_url(self, experiment):
+        return f"{self.__ui_url}experiments/{experiment.id}/data-processing"

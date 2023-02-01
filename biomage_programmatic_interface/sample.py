@@ -32,6 +32,8 @@ class Sample:
         return self.__sample_files
 
     def add_sample_file(self, sample_file):
+        if sample_file in self.__sample_files:
+            return
         self.__sample_files.append(sample_file)
 
     @staticmethod
@@ -50,11 +52,11 @@ class Sample:
                 if not file.is_valid_type():
                     continue
 
-                folder_name = file.folder
+                sample_name = file.folder
 
-                if ret.get(folder_name) is None:
-                    ret[folder_name] = Sample(folder_name)
-                ret[folder_name].add_sample_file(file)
+                if ret.get(sample_name) is None:
+                    ret[sample_name] = Sample(sample_name)
+                ret[sample_name].add_sample_file(file)
                 continue
 
             ret.update(Sample.__find_all_files_recursively(full_path))

@@ -1,10 +1,6 @@
-__pycache__
-data/
-credentials.json
-build/
-*.egg-info/
+.vscode/
 dist/
-.nextflow.log*
-.nextflow
-exception_testing
+*.egg-info
+build/
 venv/
+__pycache__

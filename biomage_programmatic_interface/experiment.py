@@ -17,10 +17,9 @@ class Experiment:
             "name": name,
             "description": "",
         }
-        print('asdasdas ', id)
         connection.fetch_api("v2/experiments/" + id, body=experiment_data)
         return Experiment(connection, id, name)
-        
+
     def __init__(self, connection, id, name):
         self.__connection = connection
         self.__id = id
@@ -54,6 +53,7 @@ class Experiment:
             sample.uuid = sample_ids_by_name[sample.name]
 
     def __upload_sample(self, sample):
+        print(len(sample.get_sample_files()))
         for sample_file in sample.get_sample_files():
             # refresh authentication here because otherwise it might fail during
             # the S3 upload and we can't refresh it there because it's a signed URL
@@ -79,18 +79,10 @@ class Experiment:
                     f"Upload failed: {e}. This is likely an error within ",
                     "the python package for uploading.",
                     "Please send an email to hello@biomage.net and we ",
-                    "will try to resolve this problem as soon as possible"
+                    "will try to resolve this problem as soon as possible",
                 )
 
-    def clone(self, to_user_id):
-        url = f"v2/experiments/{self.id}/clone"
-        response = self.__connection.fetch_api(url, body={"name": self.name, "toUserId": to_user_id})
-        exp_id = response.content.decode("utf-8").replace('"', "")
-        print('EXP I D' , exp_id)
-        return Experiment(self.__connection, exp_id, self.name)
-
     def run(self):
-        url = f'v2/experiments/{self.id}/gem2s'
-        print('Starting processing pipeline')
+        url = f"v2/experiments/{self.id}/gem2s"
         response = self.__connection.fetch_api(url)
-        print(response)
+        print("Started processing pipeline...")
