@@ -1,6 +1,7 @@
-from datetime import datetime
 import hashlib
 import uuid
+from datetime import datetime
+
 import backoff
 import requests
 
@@ -83,13 +84,11 @@ class Experiment:
 
         self.__create_samples(samples)
 
-        exc = None
         for sample in samples:
             print(f"1: {datetime.now()}")
             try:
                 self.__upload_sample(sample)
             except Exception as e:
-                exc = e
                 raise Exception(
                     f"Upload failed: {e}. This is likely an error within ",
                     "the python package for uploading.",
@@ -99,5 +98,5 @@ class Experiment:
 
     def run(self):
         url = f"v2/experiments/{self.id}/gem2s"
-        response = self.__connection.fetch_api(url)
+        self.__connection.fetch_api(url)
         print("Started processing pipeline...")
