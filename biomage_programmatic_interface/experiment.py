@@ -1,6 +1,9 @@
-import datetime
+from datetime import datetime
 import hashlib
 import uuid
+import backoff
+import requests
+
 from biomage_programmatic_interface.sample import Sample
 
 
@@ -52,6 +55,12 @@ class Experiment:
         for sample in samples:
             sample.uuid = sample_ids_by_name[sample.name]
 
+    @backoff.on_exception(
+        backoff.constant,
+        requests.exceptions.HTTPError,
+        max_tries=3,
+        jitter=backoff.full_jitter,
+    )
     def __upload_sample(self, sample):
         print(len(sample.get_sample_files()))
         for sample_file in sample.get_sample_files():
@@ -62,20 +71,26 @@ class Experiment:
                 sample_file,
             )
             s3url = s3url_raw.decode("utf-8").replace('"', "")
+            print(f"token: {self.__connection._Connection_jwt}")
+            print(f"{sample} {s3url}[{s3url_raw}], {sample.uuid}, {sample_file}")
             self.__connection.uploadS3(sample_file, s3url)
 
             self.__notify_upload(sample.uuid, sample_file.get_type())
 
     def upload_samples(self, samples_path):
         samples = Sample.get_all_samples_from_path(samples_path)
+        print(f"0: {datetime.now()}")
 
         self.__create_samples(samples)
 
+        exc = None
         for sample in samples:
+            print(f"1: {datetime.now()}")
             try:
                 self.__upload_sample(sample)
             except Exception as e:
-                print(
+                exc = e
+                raise Exception(
                     f"Upload failed: {e}. This is likely an error within ",
                     "the python package for uploading.",
                     "Please send an email to hello@biomage.net and we ",

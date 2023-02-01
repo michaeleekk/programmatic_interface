@@ -18,7 +18,7 @@ class Connection:
         cognito_params = self.__get_cognito_params().json()
         self.clientId = cognito_params["clientId"]
         self.region = cognito_params["clientRegion"]
-        self.__authenticate()
+        self.authenticate()
 
     def __get_cognito_params(self):
         try:
@@ -26,7 +26,7 @@ class Connection:
         except Exception:
             raise exceptions.InstanceNotFound() from None
 
-    def __authenticate(self):
+    def authenticate(self):
         client = boto3.client("cognito-idp", region_name=self.region)
 
         try:
@@ -72,21 +72,24 @@ class Connection:
         except requests.exceptions.HTTPError as e:
             if response.status_code == 401:
                 print("fetch_api: refresh expired token")
-                self.__authenticate()
+                self.authenticate()
             raise e
 
         return response
 
     def uploadS3(self, objectS3, signed_url, compress=True):
         if compress and not objectS3.is_compressed():
+            print(f"compressing for {signed_url}: {objectS3.path}")
             objectS3.compress()
         headers = {"Content-type": "application/octet-stream"}
+        print(f"uploading: {objectS3}")
         with open(objectS3.path, "rb") as file:
             try:
                 response = requests.put(signed_url, headers=headers, data=file.read())
                 response.raise_for_status()
             except Exception as e:
-                print(f"exception: uploadS3: {objectS3}: {signed_url}")
+                print("jwt: ", self.__jwt)
+                print(f"exception: uploadS3:\n {objectS3}:\n {signed_url}")
                 raise e
 
         print(f"Uploaded {objectS3.path} to S3") if self.verbose else ""
