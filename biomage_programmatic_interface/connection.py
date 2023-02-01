@@ -45,6 +45,8 @@ class Connection:
     def __get_api_url(self, instance_url):
         if instance_url == "local":
             return "http://localhost:3000/"
+        if instance_url == 'production':
+            return "https://api.scp.biomage.net/"
         if instance_url.startswith("https://"):
             return instance_url
         return f"https://api.{instance_url}/"

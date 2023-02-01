@@ -1,6 +1,6 @@
 import datetime
 import hashlib
-
+import uuid
 from biomage_programmatic_interface.sample import Sample
 
 
@@ -8,15 +8,16 @@ class Experiment:
     @staticmethod
     def create_experiment(connection, name=None):
         created_at = datetime.datetime.now().isoformat()
-        hashed_string = hashlib.md5(created_at.encode())
-        id = hashed_string.hexdigest()
+        hashed_string = hashlib.md5(created_at.encode()).hexdigest()
+        id = str(uuid.UUID(hex=hashed_string))
+
         name = name if name else id
         experiment_data = {
             "id": id,
             "name": name,
             "description": "",
         }
-
+        print('asdasdas ', id)
         connection.fetch_api("v2/experiments/" + id, body=experiment_data)
         return Experiment(connection, id, name)
         
@@ -84,8 +85,9 @@ class Experiment:
     def clone(self, to_user_id):
         url = f"v2/experiments/{self.id}/clone"
         response = self.__connection.fetch_api(url, body={"name": self.name, "toUserId": to_user_id})
-        print(response.content)
-        # return Experiment(self.__connection, response.content, self.name)
+        exp_id = response.content.decode("utf-8").replace('"', "")
+        print('EXP I D' , exp_id)
+        return Experiment(self.__connection, exp_id, self.name)
 
     def run(self):
         url = f'v2/experiments/{self.id}/gem2s'
