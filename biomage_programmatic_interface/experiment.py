@@ -17,7 +17,6 @@ class Experiment:
             "name": name,
             "description": "",
         }
-        print('asdasdas ', id)
         connection.fetch_api("v2/experiments/" + id, body=experiment_data)
         return Experiment(connection, id, name)
         
@@ -86,11 +85,11 @@ class Experiment:
         url = f"v2/experiments/{self.id}/clone"
         response = self.__connection.fetch_api(url, body={"name": self.name, "toUserId": to_user_id})
         exp_id = response.content.decode("utf-8").replace('"', "")
-        print('EXP I D' , exp_id)
+        print('Cloned experiment' , exp_id)
         return Experiment(self.__connection, exp_id, self.name)
 
     def run(self):
         url = f'v2/experiments/{self.id}/gem2s'
         print('Starting processing pipeline')
         response = self.__connection.fetch_api(url)
-        print(response)
+        print('Pipeline started for ', self.id)
