@@ -9,6 +9,9 @@ class SampleFile(ObjectS3):
         super().__init__(path)
         self.__uuid = str(uuid.uuid4())
 
+    def __eq__(self, other):
+        return self.get_type() == other.get_type()
+
     @classmethod
     def from_sample_file(cls, sample_file):
         return SampleFile(sample_file.path)

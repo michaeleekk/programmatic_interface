@@ -1,5 +1,7 @@
-from datetime import datetime
 import hashlib
+import uuid
+from datetime import datetime
+
 import backoff
 import requests
 
@@ -10,9 +12,9 @@ class Experiment:
     @staticmethod
     def create_experiment(connection, name=None):
         created_at = datetime.now().isoformat()
-        hashed_string = hashlib.md5(created_at.encode())
-        id = hashed_string.hexdigest()
-        name = name if name else id
+        hashed_string = hashlib.md5(created_at.encode()).hexdigest()
+        id = str(uuid.UUID(hex=hashed_string))
+        name = name if name is not None else id
         experiment_data = {
             "id": id,
             "name": name,
@@ -26,6 +28,7 @@ class Experiment:
         self.__connection = connection
         self.__id = id
         self.__name = name
+        self.verbose = connection.verbose
 
     @property
     def id(self):
@@ -70,28 +73,38 @@ class Experiment:
                 sample_file,
             )
             s3url = s3url_raw.decode("utf-8").replace('"', "")
-            print(f"token: {self.__connection._Connection_jwt}")
-            print(f"{sample} {s3url}[{s3url_raw}], {sample.uuid}, {sample_file}")
+            if self.verbose:
+                print(f"token: {self.__connection._Connection__jwt}")
+                print(f"{sample} {s3url}[{s3url_raw}], {sample.uuid}, {sample_file}")
             self.__connection.uploadS3(sample_file, s3url)
 
             self.__notify_upload(sample.uuid, sample_file.get_type())
 
     def upload_samples(self, samples_path):
         samples = Sample.get_all_samples_from_path(samples_path)
-        print(f"0: {datetime.now()}")
+
+        if self.verbose:
+            print(f"0: {datetime.now()}")
 
         self.__create_samples(samples)
 
-        exc = None
         for sample in samples:
-            print(f"1: {datetime.now()}")
+            if self.verbose:
+                print(f"1: {datetime.now()}")
             try:
                 self.__upload_sample(sample)
             except Exception as e:
-                exc = e
                 raise Exception(
                     f"Upload failed: {e}. This is likely an error within ",
                     "the python package for uploading.",
                     "Please send an email to hello@biomage.net and we ",
-                    "will try to resolve this problem as soon as possible"
+                    "will try to resolve this problem as soon as possible",
                 )
+
+    def run(self):
+        url = f"v2/experiments/{self.id}/gem2s"
+        self.__connection.fetch_api(url)
+        print(
+            "Started processing pipeline. You can track the progress at:",
+            self.__connection.get_experiment_url(self),
+        )
