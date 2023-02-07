@@ -104,4 +104,7 @@ class Experiment:
     def run(self):
         url = f"v2/experiments/{self.id}/gem2s"
         self.__connection.fetch_api(url)
-        print("Started processing pipeline...")
+        print(
+            "Started processing pipeline. You can track the progress at:",
+            self.__connection.get_experiment_url(self),
+        )
