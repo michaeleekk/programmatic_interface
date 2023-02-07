@@ -11,16 +11,16 @@ from biomage_programmatic_interface.sample import Sample
 class Experiment:
     @staticmethod
     def create_experiment(connection, name=None):
-        created_at = datetime.datetime.now().isoformat()
+        created_at = datetime.now().isoformat()
         hashed_string = hashlib.md5(created_at.encode()).hexdigest()
         id = str(uuid.UUID(hex=hashed_string))
-
-        name = name if name else id
+        name = name if name is not None else id
         experiment_data = {
             "id": id,
             "name": name,
             "description": "",
         }
+
         connection.fetch_api("v2/experiments/" + id, body=experiment_data)
         return Experiment(connection, id, name)
 
@@ -28,6 +28,7 @@ class Experiment:
         self.__connection = connection
         self.__id = id
         self.__name = name
+        self.verbose = connection.verbose
 
     @property
     def id(self):
@@ -63,29 +64,33 @@ class Experiment:
         jitter=backoff.full_jitter,
     )
     def __upload_sample(self, sample):
-        print(len(sample.get_sample_files()))
         for sample_file in sample.get_sample_files():
             # refresh authentication here because otherwise it might fail during
             # the S3 upload and we can't refresh it there because it's a signed URL
+            self.__connection.authenticate()
             s3url_raw = self.__create_sample_file(
                 sample.uuid,
                 sample_file,
             )
             s3url = s3url_raw.decode("utf-8").replace('"', "")
-            print(f"token: {self.__connection._Connection_jwt}")
-            print(f"{sample} {s3url}[{s3url_raw}], {sample.uuid}, {sample_file}")
+            if self.verbose:
+                print(f"token: {self.__connection._Connection__jwt}")
+                print(f"{sample} {s3url}[{s3url_raw}], {sample.uuid}, {sample_file}")
             self.__connection.uploadS3(sample_file, s3url)
 
             self.__notify_upload(sample.uuid, sample_file.get_type())
 
     def upload_samples(self, samples_path):
         samples = Sample.get_all_samples_from_path(samples_path)
-        print(f"0: {datetime.now()}")
+
+        if self.verbose:
+            print(f"0: {datetime.now()}")
 
         self.__create_samples(samples)
 
         for sample in samples:
-            print(f"1: {datetime.now()}")
+            if self.verbose:
+                print(f"1: {datetime.now()}")
             try:
                 self.__upload_sample(sample)
             except Exception as e:

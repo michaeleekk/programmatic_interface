@@ -38,8 +38,6 @@ class Connection:
         except Exception:
             raise exceptions.IncorrectCredentials() from None
 
-        print("Authentication succesfull") if self.verbose else ""
-
         self.__jwt = resp["AuthenticationResult"]["IdToken"]
 
     def __get_endpoints(self, instance_url):
@@ -70,6 +68,7 @@ class Connection:
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
+            print("hi")
             if response.status_code == 401:
                 print("fetch_api: refresh expired token")
                 self.authenticate()
@@ -79,10 +78,11 @@ class Connection:
 
     def uploadS3(self, objectS3, signed_url, compress=True):
         if compress and not objectS3.is_compressed():
-            print(f"compressing for {signed_url}: {objectS3.path}")
+            if self.verbose:
+                print(f"compressing for {signed_url}: {objectS3.path}")
             objectS3.compress()
         headers = {"Content-type": "application/octet-stream"}
-        print(f"uploading: {objectS3}")
+        print(f"Uploading: {objectS3.path}")
         with open(objectS3.path, "rb") as file:
             try:
                 response = requests.put(signed_url, headers=headers, data=file.read())
@@ -92,11 +92,11 @@ class Connection:
                 print(f"exception: uploadS3:\n {objectS3}:\n {signed_url}")
                 raise e
 
-        print(f"Uploaded {objectS3.path} to S3") if self.verbose else ""
+        print(f"Uploaded {objectS3.path} to S3")
 
     def create_experiment(self, experiment_name=None):
         experiment = Experiment.create_experiment(self, experiment_name)
-        print(f"Experiment {experiment.name} created!") if self.verbose else ""
+        print(f"Experiment {experiment.name} created, id: {experiment.id}")
         return experiment
 
     def get_experiment_url(self, experiment):
