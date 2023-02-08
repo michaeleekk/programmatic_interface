@@ -20,7 +20,6 @@ class Experiment:
             "name": name,
             "description": "",
         }
-
         connection.fetch_api("v2/experiments/" + id, body=experiment_data)
         return Experiment(connection, id, name)
 
@@ -100,6 +99,15 @@ class Experiment:
                     "Please send an email to hello@biomage.net and we ",
                     "will try to resolve this problem as soon as possible",
                 )
+
+    def clone(self, to_user_id):
+        url = f"v2/experiments/{self.id}/clone"
+        response = self.__connection.fetch_api(
+            url, body={"name": self.name, "toUserId": to_user_id}
+        )
+        exp_id = response.content.decode("utf-8").replace('"', "")
+        print("Cloned experiment", exp_id)
+        return Experiment(self.__connection, exp_id, self.name)
 
     def run(self):
         url = f"v2/experiments/{self.id}/gem2s"
