@@ -40,6 +40,8 @@ class SampleFile(ObjectS3):
             "barcodes.tsv": "barcodes10x",
             "features.tsv": "features10x",
             "genes.tsv": "features10x",
+            ".h5": "10x_h5",
+            ".rds": "seurat",
         }
 
         for file_type_key in file_types.keys():

@@ -7,6 +7,7 @@ import requests
 
 from biomage_programmatic_interface.sample import Sample
 
+import json
 
 class Experiment:
     @staticmethod
@@ -71,7 +72,7 @@ class Experiment:
                 sample.uuid,
                 sample_file,
             )
-            s3url = s3url_raw.decode("utf-8").replace('"', "")
+            s3url = json.loads(s3url_raw.decode("utf-8"))['signedUrls'][0]
             if self.verbose:
                 print(f"token: {self.__connection._Connection__jwt}")
                 print(f"{sample} {s3url}[{s3url_raw}], {sample.uuid}, {sample_file}")

@@ -26,7 +26,15 @@ class Sample:
         self.__uuid = uuid
 
     def to_json(self):
-        return {"name": self.__name, "sampleTechnology": "10x", "options": {}}
+        sample_file_types = [i.get_type() for i in self.__sample_files]
+        if 'seurat' in sample_file_types:
+            sample_tech = 'seurat'
+        elif '10x_h5' in sample_file_types:
+            sample_tech = '10x_h5'
+        else:
+            sample_tech = '10x'
+
+        return {"name": self.__name, "sampleTechnology": sample_tech, "options": {}}
 
     def get_sample_files(self):
         return self.__sample_files
